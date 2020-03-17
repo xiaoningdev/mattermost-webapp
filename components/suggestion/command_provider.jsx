@@ -44,31 +44,18 @@ export default class CommandProvider extends Provider {
     handlePretextChanged(pretext, resultCallback) {
         if (pretext.startsWith('/')) {
             const command = pretext.toLowerCase();
-            Client4.getCommandsList(getCurrentTeamId(store.getState())).then(
+            Client4.getAutocompleteSuggestionsList(command, getCurrentTeamId(store.getState()), '').then(
                 (data) => {
-                    let matches = [];
+                    const matches = [];
                     data.forEach((cmd) => {
-                        if (!cmd.auto_complete) {
-                            return;
-                        }
-
-                        if (cmd.trigger !== 'shortcuts' || !UserAgent.isMobile()) {
-                            if (('/' + cmd.trigger).indexOf(command) === 0) {
-                                const s = '/' + cmd.trigger;
-                                let hint = '';
-                                if (cmd.auto_complete_hint && cmd.auto_complete_hint.length !== 0) {
-                                    hint = cmd.auto_complete_hint;
-                                }
-                                matches.push({
-                                    suggestion: s,
-                                    hint,
-                                    description: cmd.auto_complete_desc,
-                                });
-                            }
+                        if (!UserAgent.isMobile()) {
+                            matches.push({
+                                suggestion: pretext,
+                                hint: cmd.Hint,
+                                description: cmd.Description,
+                            });
                         }
                     });
-
-                    matches = matches.sort((a, b) => a.suggestion.localeCompare(b.suggestion));
 
                     // pull out the suggested commands from the returned data
                     const terms = matches.map((suggestion) => suggestion.suggestion);
