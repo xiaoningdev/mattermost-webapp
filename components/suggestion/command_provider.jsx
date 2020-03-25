@@ -44,7 +44,7 @@ export default class CommandProvider extends Provider {
     handlePretextChanged(pretext, resultCallback) {
         if (pretext.startsWith('/')) {
             const command = pretext.toLowerCase();
-            Client4.getAutocompleteSuggestionsList(command, getCurrentTeamId(store.getState()), '').then(
+            Client4.getCommandAutocompleteSuggestionsList(command, getCurrentTeamId(store.getState())).then(
                 (data) => {
                     const matches = [];
                     data.forEach((cmd) => {
