@@ -41,18 +41,21 @@ export class CommandSuggestion extends Suggestion {
 }
 
 export default class CommandProvider extends Provider {
+    callback = () => {}; //eslint-disable-line no-empty-function
+
     handlePretextChanged(pretext, resultCallback) {
+        this.callback = resultCallback;
         if (pretext.startsWith('/')) {
             const command = pretext.toLowerCase();
             Client4.getCommandAutocompleteSuggestionsList(command, getCurrentTeamId(store.getState())).then(
                 (data) => {
                     const matches = [];
-                    data.forEach((cmd) => {
+                    data.forEach((sug) => {
                         if (!UserAgent.isMobile()) {
                             matches.push({
-                                suggestion: pretext,
-                                hint: cmd.Hint,
-                                description: cmd.Description,
+                                suggestion: '/' + sug.Suggestion,
+                                hint: sug.Hint,
+                                description: sug.Description,
                             });
                         }
                     });
@@ -74,5 +77,9 @@ export default class CommandProvider extends Provider {
             return true;
         }
         return false;
+    }
+
+    handleCompleteWord(term) {
+        this.handlePretextChanged(term + ' ', this.callback);
     }
 }
